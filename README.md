@@ -1,6 +1,6 @@
 # Zikiro
 
-> **Intelligent Point of Sale Application with AI**  
+> **Intelligent Point of Sale Application**  
 > Complete restaurant management system with automatic menu analysis and SMS communication
 
 [![Tauri](https://img.shields.io/badge/Tauri-1.0-blue.svg)](https://tauri.app/)
@@ -9,8 +9,9 @@
 [![Rust](https://img.shields.io/badge/Rust-1.70-orange.svg)](https://www.rust-lang.org/)
 
 ## Main Features
+![screen-capture](https://github.com/user-attachments/assets/d7b642c2-6660-429e-a614-8393f8dc1eec)
 
-### Artificial Intelligence
+### Smart fast import products
 - **MenuGPT** : Automatic menu analysis with Google Gemini
 - **MasterStocks** : Invoice analysis and inventory management
 - **Centralized configuration** : Configurable API keys via interface
@@ -154,14 +155,6 @@ The application uses SQLite with multiple databases :
 - `sms.db` : SMS configuration
 - `logs.db` : System logs
 
-## Contributing
-
-1. Fork the project
-2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
 ## Changelog
 
 ### v0.1.0 - January 2026 (Planned)
@@ -178,17 +171,6 @@ The application uses SQLite with multiple databases :
 - AI menu analysis
 - SMS communication
 
-## License
-
-This project is licensed under the MIT License. See the `LICENSE` file for more details.
-
-## Support
-
-- **Documentation** : See `ARCHITECTURE.md`
-- **Issues** : [GitHub Issues](https://github.com/Garletz/zikiro-FYR/issues)
-- **Discussions** : [GitHub Discussions](https://github.com/Garletz/zikiro-FYR/discussions)
-
----
 
 **Developed for modern restaurateurs**
 
