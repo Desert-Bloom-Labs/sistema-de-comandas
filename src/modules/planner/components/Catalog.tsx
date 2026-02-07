@@ -6,10 +6,26 @@ import { tablePlannerIntegrationService } from '../services/tablePlannerIntegrat
 import { usePlannerStore } from '../store/plannerStore'
 import type { CatalogItem } from '../types/planner'
 
+// Type for restaurant tables
+interface RestaurantTable {
+    id: string;
+    number: number;
+    name: string;
+    capacity: number;
+    status: 'free' | 'occupied' | 'reserved' | 'cleaning';
+}
+
+// Type for category
+interface Category {
+    id: string;
+    name: string;
+    icon: string;
+}
+
 const Catalog: React.FC = () => {
     const [selectedCategory, setSelectedCategory] = useState<string>('all')
     const [searchTerm, setSearchTerm] = useState('')
-    const [restaurantTables, setRestaurantTables] = useState<any[]>([])
+    const [restaurantTables, setRestaurantTables] = useState<RestaurantTable[]>([])
     const [isLoadingTables, setIsLoadingTables] = useState(false)
     const { startPlacing } = usePlannerStore()
 
@@ -59,29 +75,30 @@ const Catalog: React.FC = () => {
         return items
     }, [selectedCategory, searchTerm, restaurantTables])
 
-    const handleItemClick = (item: CatalogItem | any) => {
+    const handleItemClick = (item: CatalogItem | RestaurantTable) => {
         // Si c'est une table du restaurant, créer un item spécial
         if (selectedCategory === 'restaurant-tables') {
+            const table = item as RestaurantTable;
             const tableItem: CatalogItem = {
-                id: `table-${item.id}`,
+                id: `table-${table.id}`,
                 type: 'table',
-                name: `Table ${item.number} - ${item.name}`,
+                name: `Table ${table.number} - ${table.name}`,
                 icon: '🍽️',
                 size: { width: 1, height: 1, depth: 1 }, // Même taille que table-with-chairs
                 color: '#8B4513',
                 category: 'Tables Restaurant',
-                description: `${item.capacity} places - ${item.status}`,
+                description: `${table.capacity} places - ${table.status}`,
                 metadata: {
-                    tableId: item.id,
-                    tableNumber: item.number,
+                    tableId: table.id,
+                    tableNumber: table.number,
                     isRestaurantTable: true,
-                    capacity: item.capacity,
-                    status: item.status
+                    capacity: table.capacity,
+                    status: table.status
                 }
             }
             startPlacing(tableItem)
         } else {
-            startPlacing(item)
+            startPlacing(item as CatalogItem)
         }
     }
 
@@ -113,7 +130,7 @@ const Catalog: React.FC = () => {
                     >
                         All
                     </button>
-                    {categories.map((category) => (
+                    {categories.map((category: Category) => (
                         <button
                             key={category.id}
                             onClick={() => setSelectedCategory(category.id)}
@@ -158,7 +175,7 @@ const Catalog: React.FC = () => {
                             </p>
                         </div>
                     ) : (
-                        filteredItems.map((item) => (
+                        filteredItems.map((item: CatalogItem | RestaurantTable) => (
                             <div
                                 key={item.id}
                                 className={cn(
@@ -170,34 +187,34 @@ const Catalog: React.FC = () => {
                                 <div className="flex items-center justify-between">
                                     <div className="flex items-center space-x-3">
                                         <div className="text-2xl">
-                                            {selectedCategory === 'restaurant-tables' ? '🍽️' : item.icon}
+                                            {selectedCategory === 'restaurant-tables' ? '🍽️' : (item as CatalogItem).icon}
                                         </div>
                                         <div>
                                             <h4 className="font-medium text-gray-900 text-sm">
                                                 {selectedCategory === 'restaurant-tables'
-                                                    ? `Table ${item.number} - ${item.name}`
+                                                    ? `Table ${(item as RestaurantTable).number} - ${item.name}`
                                                     : item.name
                                                 }
                                             </h4>
                                             {selectedCategory === 'restaurant-tables' ? (
                                                 <p className="text-xs text-gray-500">
-                                                    {item.capacity} seats - {item.status}
+                                                    {(item as RestaurantTable).capacity} seats - {(item as RestaurantTable).status}
                                                 </p>
-                                            ) : item.description && (
-                                                <p className="text-xs text-gray-500">{item.description}</p>
+                                            ) : (item as CatalogItem).description && (
+                                                <p className="text-xs text-gray-500">{(item as CatalogItem).description}</p>
                                             )}
                                             <div className="flex items-center space-x-2 mt-1">
                                                 {selectedCategory === 'restaurant-tables' ? (
                                                     <>
                                                         <span className="text-xs bg-gray-100 px-2 py-1 rounded">
-                                                            {item.capacity} seats
+                                                            {(item as RestaurantTable).capacity} seats
                                                         </span>
-                                                        <span className={`text-xs px-2 py-1 rounded font-medium ${item.status === 'free' ? 'bg-green-100 text-green-800' :
-                                                            item.status === 'occupied' ? 'bg-orange-100 text-orange-800' :
-                                                                item.status === 'reserved' ? 'bg-red-100 text-red-800' :
+                                                        <span className={`text-xs px-2 py-1 rounded font-medium ${(item as RestaurantTable).status === 'free' ? 'bg-green-100 text-green-800' :
+                                                            (item as RestaurantTable).status === 'occupied' ? 'bg-orange-100 text-orange-800' :
+                                                                (item as RestaurantTable).status === 'reserved' ? 'bg-red-100 text-red-800' :
                                                                     'bg-blue-100 text-blue-800'
                                                             }`}>
-                                                            {item.status}
+                                                            {(item as RestaurantTable).status}
                                                         </span>
                                                         <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded font-medium">
                                                             ✅ Disponible
@@ -206,10 +223,10 @@ const Catalog: React.FC = () => {
                                                 ) : (
                                                     <>
                                                         <span className="text-xs bg-gray-100 px-2 py-1 rounded">
-                                                            {item.size.width}×{item.size.depth}
+                                                            {(item as CatalogItem).size.width}×{(item as CatalogItem).size.depth}
                                                         </span>
                                                         <span className="text-xs bg-gray-100 px-2 py-1 rounded">
-                                                            {item.category}
+                                                            {(item as CatalogItem).category}
                                                         </span>
                                                     </>
                                                 )}
@@ -223,7 +240,7 @@ const Catalog: React.FC = () => {
                                             style={{
                                                 backgroundColor: selectedCategory === 'restaurant-tables'
                                                     ? '#22c55e'
-                                                    : item.color
+                                                    : (item as CatalogItem).color
                                             }}
                                         />
                                     </div>
