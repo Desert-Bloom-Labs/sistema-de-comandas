@@ -30,7 +30,7 @@ pub async fn send_sms_via_infobip(
 ) -> Result<crate::models::SMSMessage, String> {
     let client = reqwest::Client::new();
     
-    // S'assurer que l'URL commence par https://
+    // Asegurarse de que la URL comience con https://
     let base_url = if config.base_url.starts_with("http://") || config.base_url.starts_with("https://") {
         config.base_url.clone()
     } else {
@@ -75,18 +75,18 @@ pub async fn send_sms_via_infobip(
 pub async fn test_infobip_connection(config: &InfobipConfig) -> Result<bool, String> {
     let client = reqwest::Client::new();
     
-    // S'assurer que l'URL commence par https://
+    // Asegurarse de que la URL comience con https://
     let base_url = if config.base_url.starts_with("http://") || config.base_url.starts_with("https://") {
         config.base_url.clone()
     } else {
         format!("https://{}", config.base_url)
     };
     
-    // Test avec un message simple
+    // Prueba con un mensaje simple
     let test_request = InfobipSMSRequest {
         messages: vec![InfobipMessage {
             destinations: vec![InfobipDestination {
-                to: "33628782725".to_string(), // Numéro de test par défaut
+                to: "33628782725".to_string(), // Número de prueba predeterminado
             }],
             from: config.sender_name.clone(),
             text: "Test de connexion Infobip".to_string(),

@@ -383,11 +383,11 @@ pub fn update_table(conn: &Connection, id: &str, table: &UpdateTableRequest) -> 
     
 
     
-    // Toujours mettre à jour updated_at
+    // Siempre actualizar updated_at
     set_clauses.push("updated_at = ?");
     params.push(Box::new(updated_at));
     
-    // Ajouter l'ID pour la clause WHERE
+    // Agregar el ID para la cláusula WHERE
     params.push(Box::new(id.to_string()));
     
     if !set_clauses.is_empty() {
@@ -398,7 +398,7 @@ pub fn update_table(conn: &Connection, id: &str, table: &UpdateTableRequest) -> 
         
         info!("Executing SQL: {}", sql);
         
-        // Convertir les paramètres en rusqlite::Params
+        // Convertir los parámetros a rusqlite::Params
         let param_refs: Vec<&dyn rusqlite::ToSql> = params.iter().map(|p| p.as_ref()).collect();
         let result = conn.execute(&sql, rusqlite::params_from_iter(param_refs));
         match &result {
@@ -1227,7 +1227,7 @@ pub fn get_planner_layout_with_items(conn: &Connection, layout_id: &str) -> Resu
 // ===== ORDERS MODULE DATABASE FUNCTIONS =====
 
 pub fn init_orders_table(conn: &Connection) -> Result<()> {
-    // Créer la table seulement si elle n'existe pas
+    // Crear la tabla solo si no existe
     conn.execute(
         "CREATE TABLE IF NOT EXISTS orders (
             id TEXT PRIMARY KEY,
@@ -1243,12 +1243,12 @@ pub fn init_orders_table(conn: &Connection) -> Result<()> {
         [],
     )?;
 
-    // Créer les index seulement s'ils n'existent pas
+    // Crear los índices solo si no existen
     conn.execute("CREATE INDEX IF NOT EXISTS idx_orders_status ON orders(status)", [])?;
     conn.execute("CREATE INDEX IF NOT EXISTS idx_orders_table_id ON orders(table_id)", [])?;
     conn.execute("CREATE INDEX IF NOT EXISTS idx_orders_created_at ON orders(created_at)", [])?;
 
-    // Migration pour ajouter le champ is_deleted s'il n'existe pas
+    // Migración para agregar el campo is_deleted si no existe
     migrate_orders_table(&conn)?;
 
     info!("Orders table initialized successfully");
@@ -1256,7 +1256,7 @@ pub fn init_orders_table(conn: &Connection) -> Result<()> {
 }
 
 fn migrate_orders_table(conn: &Connection) -> Result<()> {
-    // Vérifier si la colonne is_deleted existe
+    // Verificar si la columna is_deleted existe
     let mut table_info = conn.prepare("PRAGMA table_info(orders)")?;
     let columns: Vec<String> = table_info.query_map([], |row| {
         Ok(row.get::<_, String>(1)?)

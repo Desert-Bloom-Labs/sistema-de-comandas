@@ -51,7 +51,7 @@ export default function SIM800900Form({
     }
 
     const handleSave = () => {
-        // Toujours activer le provider quand on sauvegarde
+        // Siempre activar el proveedor al guardar
         onSave({
             ...formData,
             is_enabled: true

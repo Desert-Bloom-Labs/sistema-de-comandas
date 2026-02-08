@@ -18,7 +18,7 @@ export const usePayment = (selectedTable: TableData | null, cartItems: CartItem[
         throw new Error('Aucune table sélectionnée ou panier vide')
       }
 
-      // Vérifier s'il existe déjà une commande pour cette table
+      // Verificar si ya existe un pedido para esta mesa
       const existingOrder = await ordersService.getOrderByTable(selectedTable.id)
 
       // Convert cart items to order items format
@@ -35,11 +35,11 @@ export const usePayment = (selectedTable: TableData | null, cartItems: CartItem[
       })
 
       if (existingOrder) {
-        // Mettre à jour la commande existante
+        // Actualizar el pedido existente
         await ordersService.updateOrderItems(existingOrder.id, orderItems)
         return 'Commande mise à jour en cuisine avec succès'
       } else {
-        // Créer une nouvelle commande
+        // Crear un nuevo pedido
         await ordersService.createOrderFromCart(
           selectedTable.id,
           selectedTable.name,

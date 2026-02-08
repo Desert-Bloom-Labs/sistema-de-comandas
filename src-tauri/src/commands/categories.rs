@@ -21,8 +21,8 @@ pub async fn create_category(
     
     let mut category = Category::new(request.name);
     category.description = request.description;
-    category.color = request.color.or(Some("#3B82F6".to_string())); // Couleur par défaut si non fournie
-    category.tax_rate_id = request.tax_rate_id.or(Some("fr-standard".to_string())); // TODO: Utiliser le pays actuel depuis les settings
+    category.color = request.color.or(Some("#3B82F6".to_string())); // Color predeterminado si no se proporciona
+    category.tax_rate_id = request.tax_rate_id.or(Some("fr-standard".to_string())); // TODO: Utilizar el país actual desde los ajustes
     
     database::insert_category(&conn, &category).map_err(|e| e.to_string())?;
     
@@ -39,14 +39,14 @@ pub async fn update_category(
     let db_path = database::get_db_path().map_err(|e| e.to_string())?;
     let conn = database::get_connection(&db_path).map_err(|e| e.to_string())?;
     
-    // Récupérer la catégorie existante
+    // Obtener la categoría existente
     let existing_categories = database::get_all_categories(&conn).map_err(|e| e.to_string())?;
     let existing_category = existing_categories.iter().find(|c| c.id == id)
         .ok_or("Category not found")?;
     
     let mut category = existing_category.clone();
     
-    // Mettre à jour seulement les champs fournis
+    // Actualizar solo los campos proporcionados
     if let Some(name) = request.name {
         category.name = name;
     }

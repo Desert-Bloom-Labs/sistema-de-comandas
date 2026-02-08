@@ -76,7 +76,7 @@ export default function InfobipForm({
     }
 
     const handleSave = () => {
-        // Toujours activer le provider quand on sauvegarde
+        // Siempre activar el proveedor al guardar
         onSave({
             ...formData,
             is_enabled: true

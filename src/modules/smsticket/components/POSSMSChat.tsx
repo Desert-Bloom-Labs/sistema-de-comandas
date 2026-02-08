@@ -60,7 +60,7 @@ export default function POSSMSChat({
         }
     }, [orderId, orderTotal, orderItems])
 
-    // Récupérer les messages pour ce numéro
+    // Obtener los mensajes para este número
     const conversationMessages = phoneNumber ? getMessagesByPhone(phoneNumber) : []
 
     useEffect(() => {

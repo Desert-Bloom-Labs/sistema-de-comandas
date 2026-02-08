@@ -8,7 +8,7 @@ import {
 } from '../types/aiConfig'
 
 export const aiConfigService = {
-    // Récupérer la configuration AI actuelle
+    // Obtener la configuración AI actual
     async getAIConfig(): Promise<AIConfig | null> {
         try {
             return await invoke<AIConfig | null>('get_ai_config')
@@ -18,7 +18,7 @@ export const aiConfigService = {
         }
     },
 
-    // Sauvegarder la configuration AI
+    // Guardar la configuración AI
     async saveAIConfig(config: AIConfigRequest): Promise<AIConfigResponse> {
         try {
             return await invoke<AIConfigResponse>('save_ai_config', { config })
@@ -31,7 +31,7 @@ export const aiConfigService = {
         }
     },
 
-    // Tester la configuration AI
+    // Probar la configuración AI
     async testAIConfig(testConfig: AITestRequest): Promise<AITestResponse> {
         try {
             return await invoke<AITestResponse>('test_ai_config', { testConfig })
@@ -45,7 +45,7 @@ export const aiConfigService = {
         }
     },
 
-    // Supprimer la configuration AI
+    // Eliminar la configuración AI
     async deleteAIConfig(): Promise<AIConfigResponse> {
         try {
             return await invoke<AIConfigResponse>('delete_ai_config')
@@ -58,7 +58,7 @@ export const aiConfigService = {
         }
     },
 
-    // Vérifier si une configuration AI existe
+    // Verificar si existe una configuración AI
     async hasAIConfig(): Promise<boolean> {
         try {
             const config = await this.getAIConfig()

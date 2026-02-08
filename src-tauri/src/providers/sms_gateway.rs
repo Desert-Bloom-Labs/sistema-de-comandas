@@ -74,10 +74,10 @@ pub async fn send_sms_via_sms_gateway(
 pub async fn test_sms_gateway_connection(config: &SMSGatewayConfig, test_phone: Option<&str>) -> Result<bool, String> {
     let client = reqwest::Client::new();
     
-    // Utiliser le numéro fourni ou un numéro par défaut
+    // Utilizar el número proporcionado o un número predeterminado
     let phone_number = test_phone.unwrap_or("33628782725");
     
-    // Test avec un message simple
+    // Prueba con un mensaje simple
     let test_request = SMSRequest {
         text_message: TextMessage {
             text: "Test de connexion SMS Gateway".to_string(),

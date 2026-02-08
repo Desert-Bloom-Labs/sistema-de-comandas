@@ -9,7 +9,7 @@ import type { RestaurantItem } from '../types/planner'
 import { GRID_CONFIG } from '../utils/plannerConstants'
 import { GRID_UTILS } from '../utils/plannerGridUtils'
 
-// Fonction pour créer une texture avec du texte pour les tables
+// Función para crear una textura con texto para las mesas
 const createTableTexture = (tableNumber: number, status: string, capacity: number) => {
     try {
         const canvas = document.createElement('canvas')
@@ -18,11 +18,11 @@ const createTableTexture = (tableNumber: number, status: string, capacity: numbe
         const ctx = canvas.getContext('2d')
 
         if (!ctx) {
-            console.error('Impossible de créer le contexte 2D pour la texture de table')
+            console.error('Imposible crear el contexto 2D para la textura de la mesa')
             return null
         }
 
-        // Fond de la texture
+        // Fondo de la textura
         ctx.fillStyle = '#8B4513'
         ctx.fillRect(0, 0, 256, 256)
 
@@ -31,29 +31,29 @@ const createTableTexture = (tableNumber: number, status: string, capacity: numbe
         ctx.lineWidth = 8
         ctx.strokeRect(4, 4, 248, 248)
 
-        // Couleur de fond selon le statut
+        // Color de fondo según el estado
         const statusConfig = getTableStatusConfig(status)
         ctx.fillStyle = statusConfig.bgColor
         ctx.fillRect(12, 12, 232, 232)
 
-        // Numéro de table (grand)
+        // Número de mesa (grande)
         ctx.fillStyle = '#000000'
         ctx.font = 'bold 48px Arial'
         ctx.textAlign = 'center'
         ctx.textBaseline = 'middle'
         ctx.fillText(`Table ${tableNumber}`, 128, 80)
 
-        // Statut
+        // Estado
         ctx.fillStyle = statusConfig.color
         ctx.font = 'bold 24px Arial'
         ctx.fillText(statusConfig.label, 128, 120)
 
-        // Capacité
+        // Capacidad
         ctx.fillStyle = '#666666'
         ctx.font = '20px Arial'
         ctx.fillText(`${capacity} places`, 128, 150)
 
-        // Icône de statut
+        // Icono de estado
         ctx.font = '32px Arial'
         ctx.fillText(statusConfig.icon, 128, 180)
 
@@ -61,14 +61,14 @@ const createTableTexture = (tableNumber: number, status: string, capacity: numbe
         texture.needsUpdate = true
         return texture
     } catch (error) {
-        console.error('Erreur lors de la création de la texture de table:', error)
+        console.error('Error al crear la textura de la mesa:', error)
         return null
     }
 }
 
-// Fonction pour créer un numéro 3D flottant élégant
+// Función para crear un número 3D flotante elegante
 const createFloatingNumber3D = (number: number) => {
-    // Créer une texture avec le numéro
+    // Crear una textura con el número
     const canvas = document.createElement('canvas')
     canvas.width = 128
     canvas.height = 128
@@ -76,10 +76,10 @@ const createFloatingNumber3D = (number: number) => {
 
     if (!ctx) return null
 
-    // Fond transparent
+    // Fondo transparente
     ctx.clearRect(0, 0, 128, 128)
 
-    // Numéro en blanc avec ombre
+    // Número en blanco con sombra
     ctx.shadowColor = '#000000'
     ctx.shadowBlur = 4
     ctx.shadowOffsetX = 2
@@ -91,7 +91,7 @@ const createFloatingNumber3D = (number: number) => {
     ctx.textBaseline = 'middle'
     ctx.fillText(number.toString(), 64, 64)
 
-    // Effet de brillance
+    // Efecto de brillo
     ctx.shadowColor = 'transparent'
     ctx.fillStyle = '#FFFFFF'
     ctx.font = 'bold 80px Arial'
@@ -102,7 +102,7 @@ const createFloatingNumber3D = (number: number) => {
     return texture
 }
 
-// Composant pour afficher les informations de la table en 3D
+// Componente para mostrar información de la mesa en 3D
 const TableInfoDisplay3D: React.FC<{ tableId: string; tableNumber?: number }> = ({ tableId, tableNumber }) => {
     const [tableInfo, setTableInfo] = useState<{
         status: string
@@ -122,7 +122,7 @@ const TableInfoDisplay3D: React.FC<{ tableId: string; tableNumber?: number }> = 
                     })
                 }
             } catch (error) {
-                console.error('Erreur lors du chargement des informations de la table:', error)
+                console.error('Error al cargar la información de la mesa:', error)
             } finally {
                 setIsLoading(false)
             }
@@ -179,7 +179,7 @@ const TableInfoDisplay3D: React.FC<{ tableId: string; tableNumber?: number }> = 
 
 
 
-// Composant pour les objets 3D
+// Componente para objetos 3D
 const RestaurantObject: React.FC<{
     item: RestaurantItem
     tableData?: TablePlannerItem
@@ -199,22 +199,22 @@ const RestaurantObject: React.FC<{
     const handlePointerDown = (e: ThreeEvent<PointerEvent>) => {
         e.stopPropagation()
 
-        // Les tables longues ne peuvent pas être étendues
+        // Las mesas largas no pueden ser extendidas
         if (item.metadata?.isLongTable && item.metadata?.catalogItemId !== 'table-with-chairs') {
             return
         }
 
-        // Si c'est un objet de ligne temporaire, ne rien faire
+        // Si es un objeto de línea temporal, no hacer nada
         if (item.id.includes('-line-') && usePlannerStore.getState().isExpandingLine) {
             return
         }
 
-        // Si on est déjà en mode placement ou expansion, ne pas démarrer de nouveaux timers
+        // Si ya estamos en modo colocación o expansión, no iniciar nuevos temporizadores
         if (usePlannerStore.getState().isPlacing || usePlannerStore.getState().isExpandingLine) {
             return
         }
 
-        // Démarrer le timer de clic long
+        // Iniciar el temporizador de clic largo
         isLongPressingRef.current = false
         longPressTimerRef.current = setTimeout(() => {
             isLongPressingRef.current = true
@@ -225,47 +225,47 @@ const RestaurantObject: React.FC<{
     const handlePointerUp = (e: ThreeEvent<PointerEvent>) => {
         e.stopPropagation()
 
-        // Les tables longues ne peuvent pas être étendues, mais peuvent être sélectionnées
+        // Las mesas largas no pueden ser extendidas, pero pueden ser seleccionadas
         if (item.metadata?.isLongTable && item.metadata?.catalogItemId !== 'table-with-chairs') {
-            // Clic simple - sélectionner l'objet
+            // Clic simple - seleccionar el objeto
             selectItem(selectedItem?.id === item.id ? null : item)
             return
         }
 
-        // Si c'est un objet de ligne temporaire, ne rien faire
+        // Si es un objeto de línea temporal, no hacer nada
         if (item.id.includes('-line-') && usePlannerStore.getState().isExpandingLine) {
             return
         }
 
-        // Si on est déjà en mode placement ou expansion, ne pas traiter les clics
+        // Si ya estamos en modo colocación o expansión, no procesar clics
         if (usePlannerStore.getState().isPlacing || usePlannerStore.getState().isExpandingLine) {
             return
         }
 
-        // Annuler le timer de clic long
+        // Cancelar el temporizador de clic largo
         if (longPressTimerRef.current) {
             clearTimeout(longPressTimerRef.current)
             longPressTimerRef.current = null
         }
 
-        // Si c'était un clic long, ne pas traiter comme un clic simple
+        // Si fue un clic largo, no tratar como clic simple
         if (isLongPressingRef.current) {
             isLongPressingRef.current = false
             return
         }
 
-        // Gestion du double-clic
+        // Gestión de doble clic
         clickCountRef.current++
 
         if (clickCountRef.current === 1) {
-            // Premier clic - attendre le deuxième
+            // Primer clic - esperar el segundo
             clickTimerRef.current = setTimeout(() => {
-                // Clic simple - sélectionner l'objet
+                // Clic simple - seleccionar el objeto
                 selectItem(selectedItem?.id === item.id ? null : item)
                 clickCountRef.current = 0
             }, 300)
         } else if (clickCountRef.current === 2) {
-            // Double-clic détecté
+            // Doble clic detectado
             if (clickTimerRef.current) {
                 clearTimeout(clickTimerRef.current)
                 clickTimerRef.current = null
@@ -275,13 +275,13 @@ const RestaurantObject: React.FC<{
         }
     }
 
-    // Gestion du clic droit pour les tables associées
+    // Gestión del clic derecho para mesas asociadas
     const handleContextMenu = (e: ThreeEvent<MouseEvent>) => {
         e.stopPropagation()
         e.nativeEvent.preventDefault()
 
         if (tableData?.planner_item.table_id) {
-            // Ouvrir le menu contextuel pour les tables associées
+            // Abrir el menú contextual para mesas asociadas
             const table = {
                 id: tableData.planner_item.table_id,
                 number: tableData.planner_item.table_number || 0,
@@ -302,7 +302,7 @@ const RestaurantObject: React.FC<{
     const handlePointerLeave = (e: ThreeEvent<PointerEvent>) => {
         e.stopPropagation()
 
-        // Annuler tous les timers si on quitte l'objet
+        // Cancelar todos los temporizadores al salir del objeto
         if (longPressTimerRef.current) {
             clearTimeout(longPressTimerRef.current)
             longPressTimerRef.current = null
@@ -317,7 +317,7 @@ const RestaurantObject: React.FC<{
 
     const isSelected = selectedItem?.id === item.id
 
-    // Rendu spécial pour les tables longues (priorité sur table-with-chairs normale)
+    // Renderizado especial para mesas largas (prioridad sobre mesa de sillas normal)
     if (item.metadata?.isLongTable) {
         const isHorizontal = item.metadata.direction === 'horizontal'
         const length = isHorizontal ? item.size.width : item.size.depth
@@ -334,7 +334,7 @@ const RestaurantObject: React.FC<{
                 onPointerUp={handlePointerUp}
                 onPointerLeave={handlePointerLeave}
             >
-                {/* Table longue principale */}
+                {/* Mesa larga principal */}
                 <mesh>
                     <boxGeometry args={[
                         isHorizontal ? length : 0.6,
@@ -398,7 +398,7 @@ const RestaurantObject: React.FC<{
                     )
                 })}
 
-                {/* Indicateur de sélection */}
+                {/* Indicador de selección */}
                 {isSelected && (
                     <mesh position={[0, item.size.height / 2 + 0.1, 0]}>
                         <boxGeometry args={[item.size.width + 0.2, 0.1, item.size.depth + 0.2]} />
@@ -406,7 +406,7 @@ const RestaurantObject: React.FC<{
                     </mesh>
                 )}
 
-                {/* Indicateur de grille */}
+                {/* Indicador de cuadrícula */}
                 <mesh position={[0, -item.size.height / 2 - 0.01, 0]}>
                     <boxGeometry args={[item.size.width, 0.02, item.size.depth]} />
                     <meshStandardMaterial color="#3b82f6" transparent opacity={0.3} />
@@ -415,9 +415,9 @@ const RestaurantObject: React.FC<{
         )
     }
 
-    // Rendu spécial pour les tables restaurant
+    // Renderizado especial para mesas de restaurante
     if (item.metadata?.isRestaurantTable || item.id.startsWith('table-')) {
-        // Récupérer les données mises à jour de la table depuis la base de données
+        // Obtener los datos actualizados de la mesa desde la base de datos
         const [liveTableData, setLiveTableData] = useState<{
             status: string
             capacity: number
@@ -439,22 +439,22 @@ const RestaurantObject: React.FC<{
                         }
                     }
                 } catch (error) {
-                    console.error('Erreur lors de la récupération des données live de la table:', error)
+                    console.error('Error al obtener datos en vivo de la mesa:', error)
                 }
             }
 
             fetchLiveTableData()
 
-            // Mettre à jour toutes les 5 secondes pour les changements de statut
+            // Actualizar cada 5 segundos para cambios de estado
             const interval = setInterval(fetchLiveTableData, 5000)
             return () => clearInterval(interval)
         }, [item.metadata?.tableId])
 
 
 
-        // Créer la texture pour la table si on a les données
+        // Crear la textura para la mesa si tenemos los datos
         const tableTexture = useMemo(() => {
-            // Priorité aux données live (mises à jour depuis la base de données)
+            // Prioridad a los datos en vivo (actualizados desde la base de datos)
             if (liveTableData) {
                 return createTableTexture(
                     liveTableData.number,
@@ -462,7 +462,7 @@ const RestaurantObject: React.FC<{
                     liveTableData.capacity
                 )
             }
-            // Fallback aux données de tableData (si la table est associée)
+            // Alternativa a los datos de tableData (si la mesa está asociada)
             else if (tableData?.table_status && tableData.planner_item.table_number && tableData.table_capacity) {
                 return createTableTexture(
                     tableData.planner_item.table_number,
@@ -470,22 +470,22 @@ const RestaurantObject: React.FC<{
                     tableData.table_capacity
                 )
             }
-            // Fallback aux métadonnées de l'item (pour les tables nouvellement placées)
+            // Alternativa a los metadatos del elemento (para mesas recién colocadas)
             else if (item.metadata?.tableNumber && item.metadata?.tableId) {
                 return createTableTexture(
                     item.metadata.tableNumber,
-                    item.metadata.status || 'free', // Utiliser le statut depuis les métadonnées
+                    item.metadata.status || 'free', // Usar el estado desde los metadatos
                     item.metadata.capacity || 4
                 )
             }
             return null
         }, [liveTableData, tableData?.table_status, tableData?.planner_item.table_number, tableData?.table_capacity, item.metadata?.tableNumber, item.metadata?.tableId, item.metadata?.capacity])
 
-        // Déterminer la couleur de la table selon son statut
-        let tableColor = "#8B4513" // Couleur par défaut
+        // Determinar el color de la mesa según su estado
+        let tableColor = "#8B4513" // Color predeterminado
         let currentStatus = 'free'
 
-        // Priorité aux données live
+        // Prioridad a los datos en vivo
         if (liveTableData?.status) {
             currentStatus = liveTableData.status
             const statusConfig = getTableStatusConfig(liveTableData.status)
@@ -685,7 +685,7 @@ const RestaurantObject: React.FC<{
 
 
 
-    // Rendu standard pour les autres objets
+    // Renderizado estándar para los otros objetos
     return (
         <mesh
             ref={meshRef}
@@ -720,16 +720,16 @@ const RestaurantObject: React.FC<{
     )
 }
 
-// Composant pour les objets en cours de placement
+// Componente para objetos en proceso de colocación
 const PlacingObject: React.FC = () => {
     const { placingItem, isPlacing, currentLayout } = usePlannerStore()
 
-    // Créer une texture pour la table en cours de placement (toujours appelé)
+    // Crear una textura para la mesa en proceso de colocación (siempre llamado)
     const placementTexture = useMemo(() => {
         if (placingItem?.metadata?.tableId && placingItem?.metadata?.tableNumber) {
-            // Récupérer les informations de la table depuis le store ou les métadonnées
+            // Obtener la información de la mesa desde el store o los metadatos
             const tableNumber = placingItem.metadata.tableNumber
-            const status = 'free' // Statut par défaut pour le placement
+            const status = 'free' // Estado predeterminado para colocación
             const capacity = placingItem.metadata.capacity || 4
 
             return createTableTexture(tableNumber, status, capacity)
@@ -739,14 +739,14 @@ const PlacingObject: React.FC = () => {
 
     if (!isPlacing || !placingItem) return null
 
-    // Vérifier si le placement est possible
+    // Verificar si la colocación es posible
     const canPlace = GRID_UTILS.canPlaceObject(
         placingItem.position,
         placingItem.size,
         currentLayout.items
     )
 
-    // Rendu spécial pour les tables longues en cours de placement
+    // Renderizado especial para mesas largas en proceso de colocación
     if (placingItem.metadata?.isLongTable) {
         const isHorizontal = placingItem.metadata.direction === 'horizontal'
         const length = isHorizontal ? placingItem.size.width : placingItem.size.depth
@@ -836,7 +836,7 @@ const PlacingObject: React.FC = () => {
         )
     }
 
-    // Rendu spécial pour les tables restaurant
+    // Renderizado especial para mesas de restaurante
     if (placingItem.metadata?.isRestaurantTable || placingItem.id.includes('table-')) {
         return (
             <group
@@ -960,7 +960,7 @@ const PlacingObject: React.FC = () => {
         )
     }
 
-    // Rendu spécial pour la table avec chaises
+    // Renderizado especial para la mesa con sillas
     if (placingItem.id.includes('table-with-chairs')) {
         return (
             <group
@@ -1072,7 +1072,7 @@ const PlacingObject: React.FC = () => {
     )
 }
 
-// Composant pour les objets de ligne en cours d'expansion
+// Componente para los objetos de línea en curso de expansión
 const ExpandingLineObjects: React.FC = () => {
     const { lineItems, isExpandingLine, currentLayout } = usePlannerStore()
 
@@ -1081,7 +1081,7 @@ const ExpandingLineObjects: React.FC = () => {
     return (
         <>
             {lineItems.map((item) => {
-                // Vérifier si chaque objet de la ligne peut être placé
+                // Verificar si cada objeto de la línea puede ser colocado
                 const canPlace = GRID_UTILS.canPlaceObject(
                     item.position,
                     item.size,
@@ -1117,7 +1117,7 @@ const ExpandingLineObjects: React.FC = () => {
     )
 }
 
-// Composant pour la scène 3D
+// Componente para la escena 3D
 const Scene: React.FC = () => {
     const { currentLayout } = usePlannerStore()
     const { camera } = useThree()
@@ -1129,7 +1129,7 @@ const Scene: React.FC = () => {
         camera.lookAt(0, 0, 0)
     }, [camera])
 
-    // Charger les données des tables associées
+    // Cargar los datos de las mesas asociadas
     useEffect(() => {
         if (currentLayout?.id) {
             tablePlannerIntegrationService.getPlannerItemsWithTableStatus(currentLayout.id)
@@ -1138,7 +1138,7 @@ const Scene: React.FC = () => {
         }
     }, [currentLayout?.id])
 
-    // Synchronisation temps réel des statuts des tables
+    // Sincronización en tiempo real de los estados de las mesas
     useEffect(() => {
         if (!currentLayout?.id) return
 
@@ -1146,14 +1146,14 @@ const Scene: React.FC = () => {
             tablePlannerIntegrationService.getPlannerItemsWithTableStatus(currentLayout.id)
                 .then(setTableData)
                 .catch(console.error)
-        }, 3000) // Mise à jour toutes les 3 secondes
+        }, 3000) // Actualización cada 3 segundos
 
         return () => clearInterval(interval)
     }, [currentLayout?.id])
 
     return (
         <>
-            {/* Éclairage amélioré pour les textures */}
+            {/* Iluminación mejorada para las texturas */}
             <ambientLight intensity={0.6} />
             <directionalLight
                 position={[10, 10, 5]}
@@ -1247,18 +1247,18 @@ const View3D: React.FC = () => {
     const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
     const canvasRef = useRef<HTMLCanvasElement>(null)
 
-    // Fonction pour convertir les coordonnées tactiles en coordonnées monde
+    // Función para convertir las coordenadas táctiles en coordenadas del mundo
     const getWorldPosition = (clientX: number, clientY: number) => {
         if (!canvasRef.current) return { x: 0, y: 0, z: 0 }
 
         const canvas = canvasRef.current
         const rect = canvas.getBoundingClientRect()
 
-        // Calculer la position relative dans le canvas (0 à 1)
+        // Calcular la posición relativa en el canvas (0 a 1)
         const relativeX = (clientX - rect.left) / rect.width
         const relativeY = (clientY - rect.top) / rect.height
 
-        // Convertir en coordonnées 3D du monde (grille)
+        // Convertir a coordenadas 3D del mundo (cuadrícula)
         const worldX = Math.floor((relativeX - 0.5) * GRID_CONFIG.ROOM_WIDTH)
         const worldZ = Math.floor((relativeY - 0.5) * GRID_CONFIG.ROOM_DEPTH)
 
@@ -1267,14 +1267,14 @@ const View3D: React.FC = () => {
 
     const handleMouseMove = (event: React.MouseEvent) => {
         if (isExpandingLine) {
-            // En mode agrandissement, mettre à jour la ligne
+            // En modo agrandamiento, actualizar la línea
             const worldPos = getWorldPosition(event.clientX, event.clientY)
             if (GRID_UTILS.isInBounds(worldPos.x, worldPos.z)) {
                 usePlannerStore.getState().updateExpandingLine(worldPos)
             }
             setMousePosition({ x: event.clientX, y: event.clientY })
         } else if (isPlacing && usePlannerStore.getState().placingItem && canvasRef.current) {
-            // Mode normal, mettre à jour la position
+            // Modo normal, actualizar la posición
             const worldPos = getWorldPosition(event.clientX, event.clientY)
             if (GRID_UTILS.isInBounds(worldPos.x, worldPos.z)) {
                 usePlannerStore.getState().updatePlacingPosition(worldPos)
@@ -1284,7 +1284,7 @@ const View3D: React.FC = () => {
     }
 
     const handleCanvasClick = (event: React.MouseEvent) => {
-        // Ne traiter que si on clique vraiment dans le vide (pas sur un objet)
+        // Solo procesar si realmente se hace clic en el vacío (no en un objeto)
         if (event.target === event.currentTarget) {
             if (isExpandingLine) {
                 // En mode agrandissement, valider la ligne

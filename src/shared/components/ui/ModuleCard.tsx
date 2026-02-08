@@ -11,13 +11,13 @@ import {
   Shield,
   Table,
   Tags,
-  Warehouse
-} from 'lucide-react'
-import { Module } from '../../types/app'
+  Warehouse,
+} from 'lucide-react';
+import { Module } from '../../types/app';
 
 interface ModuleCardProps {
-  module: Module
-  onClick: () => void
+  module: Module;
+  onClick: () => void;
 }
 
 const iconMap = {
@@ -34,7 +34,7 @@ const iconMap = {
   Brain,
   Warehouse,
   MessageSquare,
-}
+};
 
 const colorClasses = {
   primary: 'bg-blue-600',
@@ -43,8 +43,8 @@ const colorClasses = {
   danger: 'bg-red-600',
   info: 'bg-cyan-600',
   secondary: 'bg-slate-600',
-  purple: 'bg-purple-600'
-}
+  purple: 'bg-purple-600',
+};
 
 const colorShadows = {
   primary: 'rgba(37, 99, 235, 0.7)',
@@ -53,46 +53,23 @@ const colorShadows = {
   danger: 'rgba(220, 38, 38, 0.7)',
   info: 'rgba(8, 145, 178, 0.7)',
   secondary: 'rgba(71, 85, 105, 0.7)',
-  purple: 'rgba(147, 51, 234, 0.7)'
-}
+  purple: 'rgba(147, 51, 234, 0.7)',
+};
 
 export default function ModuleCard({ module, onClick }: ModuleCardProps) {
-  const IconComponent = iconMap[module.icon as keyof typeof iconMap]
-  const bgColor = colorClasses[module.color as keyof typeof colorClasses] || 'bg-blue-600'
-  const shadowColor = colorShadows[module.color as keyof typeof colorShadows] || 'rgba(37, 99, 235, 0.7)'
-  const uniqueId = `module-${module.id}`
-
-  // Use module names if available, otherwise fallback to title
-  const moduleNames = module.names || {
-    french: module.title,
-    english: module.title,
-    spanish: module.title,
-    chinese: module.title,
-    hindi: module.title
-  }
+  const IconComponent = iconMap[module.icon as keyof typeof iconMap];
+  const bgColor =
+    colorClasses[module.color as keyof typeof colorClasses] || 'bg-blue-600';
+  const shadowColor =
+    colorShadows[module.color as keyof typeof colorShadows] ||
+    'rgba(37, 99, 235, 0.7)';
+  const uniqueId = `module-${module.id}`;
 
   return (
     <div className="inline-block m-8 cursor-pointer relative">
-      {/* Module names positioned on 4 sides */}
-
-      {/* Hindi text on the left */}
-      <div className="absolute -left-8 top-1/2 transform -translate-y-1/2 text-white font-semibold text-sm writing-vertical-rl no-wrap-text">
-        {moduleNames.hindi}
-      </div>
-
-      {/* Chinese text on the right */}
-      <div className="absolute -right-8 top-1/2 transform -translate-y-1/2 text-white font-semibold text-sm writing-vertical-rl no-wrap-text">
-        {moduleNames.chinese}
-      </div>
-
-      {/* English text on top */}
+      {/* Module name in Spanish - centered on top */}
       <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 text-white font-semibold text-sm no-wrap-text">
-        {moduleNames.english}
-      </div>
-
-      {/* French text on bottom */}
-      <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 text-white font-semibold text-sm no-wrap-text">
-        {moduleNames.french}
+        {module.title}
       </div>
 
       <button
@@ -110,13 +87,13 @@ export default function ModuleCard({ module, onClick }: ModuleCardProps) {
           height: '80px',
           borderRadius: '12px',
         }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.transform = 'rotate(45deg) scale(1.1)'
-          e.currentTarget.style.boxShadow = '0 12px 24px rgba(0, 0, 0, 0.4)'
+        onMouseEnter={e => {
+          e.currentTarget.style.transform = 'rotate(45deg) scale(1.1)';
+          e.currentTarget.style.boxShadow = '0 12px 24px rgba(0, 0, 0, 0.4)';
         }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.transform = 'rotate(45deg) scale(1)'
-          e.currentTarget.style.boxShadow = '0 8px 16px rgba(0, 0, 0, 0.3)'
+        onMouseLeave={e => {
+          e.currentTarget.style.transform = 'rotate(45deg) scale(1)';
+          e.currentTarget.style.boxShadow = '0 8px 16px rgba(0, 0, 0, 0.3)';
         }}
         className={`${uniqueId} ${bgColor}`}
       >
@@ -157,6 +134,5 @@ export default function ModuleCard({ module, onClick }: ModuleCardProps) {
         }
       `}</style>
     </div>
-  )
+  );
 }
-

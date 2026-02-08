@@ -199,7 +199,7 @@ impl Category {
             name,
             description: None,
             color: None,
-            tax_rate_id: Some("fr-standard".to_string()), // TVA standard par défaut
+            tax_rate_id: Some("fr-standard".to_string()), // IVA estándar predeterminado
             is_active: true,
             created_at: now,
             updated_at: now,
@@ -259,8 +259,8 @@ pub struct UpdateCartItemRequest {
 impl Table {
     pub fn new(number: i32, name: String, capacity: i32) -> Self {
         let now = Utc::now();
-        // Position simple basée sur le numéro de table (côte à côte)
-        let position_x = 100 + (number - 1) * 150; // 150px d'espacement entre les tables
+        // Posición simple basada en el número de mesa (lado a lado)
+        let position_x = 100 + (number - 1) * 150; // 150px de espaciado entre mesas
         let position_y = 100;
         Self {
             id: Uuid::new_v4().to_string(),
@@ -482,7 +482,7 @@ pub struct Order {
     pub items: Vec<OrderItem>,
     pub total_amount: f64,
     pub status: String,   // "pending", "in_kitchen", "ready", "completed"
-    pub is_deleted: bool, // Pour la corbeille
+    pub is_deleted: bool, // Para la papelera
     pub created_at: DateTime<Utc>,
 }
 
@@ -674,7 +674,7 @@ pub struct SecureLogEntry {
     pub user_signature: String,
     pub chain_index: i64,
 
-    // Données transactionnelles
+    // Datos transaccionales
     pub table_id: Option<String>,
     pub table_name: Option<String>,
     pub product_id: Option<String>,
@@ -752,8 +752,8 @@ pub struct SecurityConfig {
     pub enable_chain_validation: bool,
     pub enable_time_validation: bool,
     pub enable_anomaly_detection: bool,
-    pub max_time_drift: i64,           // en secondes
-    pub min_transaction_interval: i64, // en millisecondes
+    pub max_time_drift: i64,           // en segundos
+    pub min_transaction_interval: i64, // en milisegundos
     pub suspicious_amount_threshold: f64,
     pub compliance_country: String,
     pub retention_period: i64, // en jours
@@ -783,7 +783,7 @@ impl SecureLogEntry {
         let now = Utc::now();
         let system_clock = now.timestamp();
 
-        // Calculer le hash de la transaction
+        // Calcular el hash de la transacción
         let data_to_hash = format!(
             "{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}",
             log_type.to_string(),

@@ -17,7 +17,7 @@ export default function ModernProductCard({
     const isLowStock = product.stock_quantity <= 5
     const isOutOfStock = product.stock_quantity === 0
 
-    // Fonction pour détecter le type de script
+    // Función para detectar el tipo de escritura
     const detectScriptType = (text: string): 'latin' | 'chinese' | 'hindi' | 'arabic' | 'mixed' => {
         const chineseRegex = /[\u4e00-\u9fff\u3400-\u4dbf\u20000-\u2a6df\u2a700-\u2b73f\u2b740-\u2b81f\u2b820-\u2ceaf\uf900-\ufaff\u3300-\u33ff\u2e80-\u2eff\u2f00-\u2fdf\u31c0-\u31ef\u3200-\u32ff\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff\u3300-\u33ff]/
         const hindiRegex = /[\u0900-\u097f\u1cd0-\u1cff\u200c\u200d\u20f0]/
@@ -34,7 +34,7 @@ export default function ModernProductCard({
         return 'latin'
     }
 
-    // Fonction pour calculer la taille de police adaptative multi-scripts
+    // Función para calcular el tamaño de fuente adaptativo multi-escritura
     const getAdaptiveFontSize = (text: string): string => {
         const length = text.length
         const scriptType = detectScriptType(text)
@@ -80,12 +80,12 @@ export default function ModernProductCard({
         return 'text-xs'                         // Très long (fallback)
     }
 
-    // Fonction pour calculer le line-clamp adaptatif multi-scripts
+    // Función para calcular el line-clamp adaptativo multi-escritura
     const getAdaptiveLineClamp = (text: string): string => {
         const length = text.length
         const scriptType = detectScriptType(text)
 
-        // Ajustements selon le type de script
+        // Ajustes según el tipo de escritura
         if (scriptType === 'chinese') {
             // Les caractères chinois sont plus larges, moins de lignes
             if (length <= 4) return 'line-clamp-1'   // Court = 1 ligne

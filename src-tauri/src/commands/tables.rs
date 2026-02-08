@@ -25,7 +25,7 @@ pub fn create_table(request: CreateTableRequest) -> Result<Table, String> {
     let db_path = get_db_path().map_err(|e| e.to_string())?;
     let conn = get_connection(&db_path).map_err(|e| e.to_string())?;
     
-    // Vérifier si le numéro de table est déjà pris
+    // Verificar si el número de mesa ya está tomado
     if is_table_number_taken(&conn, request.number, None).map_err(|e| e.to_string())? {
         return Err(format!("Le numéro de table {} est déjà utilisé", request.number));
     }
@@ -55,7 +55,7 @@ pub fn update_table_command(id: String, request: serde_json::Value) -> Result<()
     let db_path = get_db_path().map_err(|e| e.to_string())?;
     let conn = get_connection(&db_path).map_err(|e| e.to_string())?;
     
-    // Convertir la requête JSON en UpdateTableRequest
+    // Convertir la solicitud JSON en UpdateTableRequest
     let mut update_request = UpdateTableRequest {
         number: None,
         name: None,
@@ -66,7 +66,7 @@ pub fn update_table_command(id: String, request: serde_json::Value) -> Result<()
 
     };
     
-    // Traiter les champs optionnels
+    // Procesar los campos opcionales
     if let Some(number) = request.get("number").and_then(|v| v.as_i64()) {
         update_request.number = Some(number as i32);
     }
@@ -117,17 +117,17 @@ pub fn create_reservation(reservation: CreateReservationRequest) -> Result<Table
     let db_path = get_db_path().map_err(|e| e.to_string())?;
     let conn = get_connection(&db_path).map_err(|e| e.to_string())?;
     
-    // Vérifier que la table existe
+    // Verificar que la mesa exista
     let table = get_table_by_id(&conn, &reservation.table_id)
         .map_err(|e| e.to_string())?
         .ok_or_else(|| "Table not found".to_string())?;
     
-    // Vérifier la capacité
+    // Verificar la capacidad
     if reservation.party_size > table.capacity {
         return Err(format!("Party size ({}) exceeds table capacity ({})", reservation.party_size, table.capacity));
     }
     
-    // Créer la réservation
+    // Crear la reserva
     let reservation_id = uuid::Uuid::new_v4().to_string();
     let now = chrono::Utc::now();
     let duration = reservation.duration_minutes.unwrap_or(120);
@@ -148,7 +148,7 @@ pub fn create_reservation(reservation: CreateReservationRequest) -> Result<Table
         updated_at: now,
     };
     
-    // Insérer en base
+    // Insertar en base de datos
     crate::database::insert_reservation(&conn, &new_reservation).map_err(|e| e.to_string())?;
     
     Ok(new_reservation)

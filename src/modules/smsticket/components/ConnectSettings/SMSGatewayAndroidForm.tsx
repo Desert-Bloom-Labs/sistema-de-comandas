@@ -81,7 +81,7 @@ export default function SMSGatewayAndroidForm({
     }
 
     const handleSave = () => {
-        // Toujours activer le provider quand on sauvegarde
+        // Siempre activar el proveedor al guardar
         onSave({
             ...formData,
             is_enabled: true

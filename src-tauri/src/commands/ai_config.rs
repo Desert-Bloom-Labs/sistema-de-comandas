@@ -5,7 +5,7 @@ use serde_json::json;
 use tracing::info;
 use chrono::Utc;
 
-// Récupérer la configuration AI actuelle
+// Obtener la configuración AI actual
 #[tauri::command]
 pub async fn get_ai_config() -> Result<Option<AIConfig>, String> {
     let db_path = get_business_db_path().map_err(|e| e.to_string())?;
@@ -43,20 +43,20 @@ pub async fn get_ai_config() -> Result<Option<AIConfig>, String> {
     }
 }
 
-// Sauvegarder la configuration AI
+// Guardar la configuración AI
 #[tauri::command]
 pub async fn save_ai_config(config: AIConfigRequest) -> Result<AIConfigResponse, String> {
-    // Initialiser la base de données si nécessaire
+    // Inicializar la base de datos si es necesario
     init_ai_config_database().map_err(|e| e.to_string())?;
     
     let db_path = get_business_db_path().map_err(|e| e.to_string())?;
     let conn = get_connection(&db_path).map_err(|e| e.to_string())?;
     
-    // Désactiver toutes les configurations existantes
+    // Desactivar todas las configuraciones existentes
     conn.execute("UPDATE ai_config SET is_active = 0", [])
         .map_err(|e| e.to_string())?;
     
-    // Créer la nouvelle configuration
+    // Crear la nueva configuración
     let new_config = AIConfig::new(config);
     let now = Utc::now().to_rfc3339();
     
@@ -84,7 +84,7 @@ pub async fn save_ai_config(config: AIConfigRequest) -> Result<AIConfigResponse,
     })
 }
 
-// Tester la configuration AI
+// Probar la configuración AI
 #[tauri::command]
 pub async fn test_ai_config(test_config: AITestRequest) -> Result<AITestResponse, String> {
     info!("Testing AI configuration for provider: {}", test_config.provider);
@@ -135,7 +135,7 @@ pub async fn test_ai_config(test_config: AITestRequest) -> Result<AITestResponse
     Ok(response)
 }
 
-// Supprimer la configuration AI
+// Eliminar la configuración AI
 #[tauri::command]
 pub async fn delete_ai_config() -> Result<AIConfigResponse, String> {
     let db_path = get_business_db_path().map_err(|e| e.to_string())?;

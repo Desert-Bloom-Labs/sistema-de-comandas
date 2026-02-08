@@ -1,66 +1,81 @@
-import { zodResolver } from '@hookform/resolvers/zod'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { invoke } from '@tauri-apps/api/core'
-import { AlertCircle, CheckCircle, Edit, Plus, Tags, Trash2 } from 'lucide-react'
-import React, { useRef, useState } from 'react'
-import { useForm } from 'react-hook-form'
-import { z } from 'zod'
-import { useTaxSettings } from '../../shared/hooks/useTaxSettings'
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { invoke } from '@tauri-apps/api/core';
+import {
+  AlertCircle,
+  CheckCircle,
+  Edit,
+  Plus,
+  Tags,
+  Trash2,
+} from 'lucide-react';
+import React, { useRef, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+import { useTaxSettings } from '../../shared/hooks/useTaxSettings';
 
 interface Category {
-  id: string
-  name: string
-  description?: string
-  color: string
-  tax_rate_id?: string
-  is_active: boolean
-  created_at: string
-  updated_at: string
+  id: string;
+  name: string;
+  description?: string;
+  color: string;
+  tax_rate_id?: string;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
 }
 
 const categorySchema = z.object({
-  name: z.string().min(1, 'Name is required'),
+  name: z.string().min(1, 'El nombre es requerido'),
   description: z.string().optional(),
-  color: z.string().min(1, 'Color is required'),
+  color: z.string().min(1, 'El color es requerido'),
   tax_rate_id: z.string().optional(),
-})
+});
 
-type CategoryFormData = z.infer<typeof categorySchema>
+type CategoryFormData = z.infer<typeof categorySchema>;
 
 export default function Categories() {
   // Debug: trace renders
 
-  const [showAddModal, setShowAddModal] = useState(false)
-  const [showEditModal, setShowEditModal] = useState(false)
-  const [editingCategory, setEditingCategory] = useState<Category | null>(null)
-  const [showSuccessMessage, setShowSuccessMessage] = useState<string | null>(null)
-  const [showErrorMessage, setShowErrorMessage] = useState<string | null>(null)
-  const queryClient = useQueryClient()
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editingCategory, setEditingCategory] = useState<Category | null>(null);
+  const [showSuccessMessage, setShowSuccessMessage] = useState<string | null>(
+    null
+  );
+  const [showErrorMessage, setShowErrorMessage] = useState<string | null>(null);
+  const queryClient = useQueryClient();
 
   // Refs to synchronize color fields
-  const addColorPickerRef = useRef<HTMLInputElement>(null)
-  const addColorInputRef = useRef<HTMLInputElement>(null)
-  const editColorPickerRef = useRef<HTMLInputElement>(null)
-  const editColorInputRef = useRef<HTMLInputElement>(null)
+  const addColorPickerRef = useRef<HTMLInputElement>(null);
+  const addColorInputRef = useRef<HTMLInputElement>(null);
+  const editColorPickerRef = useRef<HTMLInputElement>(null);
+  const editColorInputRef = useRef<HTMLInputElement>(null);
 
   // Tax rate options based on settings
-  const { currentConfig } = useTaxSettings()
+  const { currentConfig } = useTaxSettings();
 
   const taxRateOptions = currentConfig.tax_rates.map(rate => ({
     value: rate.id,
     label: `${rate.name} (${rate.rate}%)`,
     description: rate.description || '',
-    isDefault: rate.is_default
-  }))
+    isDefault: rate.is_default,
+  }));
 
   // Find default rate for current country
-  const defaultTaxRate = currentConfig.tax_rates.find(rate => rate.is_default)?.id || currentConfig.tax_rates[0]?.id
+  const defaultTaxRate =
+    currentConfig.tax_rates.find(rate => rate.is_default)?.id ||
+    currentConfig.tax_rates[0]?.id;
 
-  const { data: categories, isLoading, error } = useQuery<Category[]>({
+  const {
+    data: categories,
+    isLoading,
+    error,
+  } = useQuery<Category[]>({
     queryKey: ['categories'],
     queryFn: () => invoke('get_categories'),
     retry: 3,
-  })
+  });
 
   const {
     register,
@@ -76,7 +91,7 @@ export default function Categories() {
       color: '#3B82F6',
       tax_rate_id: defaultTaxRate,
     },
-  })
+  });
 
   // Force form update when country changes
   React.useEffect(() => {
@@ -86,9 +101,9 @@ export default function Categories() {
         description: '',
         color: '#3B82F6',
         tax_rate_id: defaultTaxRate,
-      })
+      });
     }
-  }, [defaultTaxRate, reset])
+  }, [defaultTaxRate, reset]);
 
   const {
     register: editRegister,
@@ -98,91 +113,94 @@ export default function Categories() {
     formState: { errors: editErrors },
   } = useForm<CategoryFormData>({
     resolver: zodResolver(categorySchema),
-  })
+  });
 
   const createCategoryMutation = useMutation({
-    mutationFn: (data: CategoryFormData) => invoke('create_category', { request: data }),
+    mutationFn: (data: CategoryFormData) =>
+      invoke('create_category', { request: data }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['categories'] })
-      setShowAddModal(false)
-      reset()
-      setShowSuccessMessage('Category created successfully!')
-      setTimeout(() => setShowSuccessMessage(null), 3000)
+      queryClient.invalidateQueries({ queryKey: ['categories'] });
+      setShowAddModal(false);
+      reset();
+      setShowSuccessMessage('Category created successfully!');
+      setTimeout(() => setShowSuccessMessage(null), 3000);
     },
-    onError: (error) => {
-      setShowErrorMessage('Error creating category: ' + error)
-      setTimeout(() => setShowErrorMessage(null), 5000)
+    onError: error => {
+      setShowErrorMessage('Error creating category: ' + error);
+      setTimeout(() => setShowErrorMessage(null), 5000);
     },
-  })
+  });
 
   const updateCategoryMutation = useMutation({
     mutationFn: ({ id, data }: { id: string; data: CategoryFormData }) =>
       invoke('update_category', { id, request: data }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['categories'] })
-      setShowEditModal(false)
-      setEditingCategory(null)
-      editReset()
-      setShowSuccessMessage('Category updated successfully!')
-      setTimeout(() => setShowSuccessMessage(null), 3000)
+      queryClient.invalidateQueries({ queryKey: ['categories'] });
+      setShowEditModal(false);
+      setEditingCategory(null);
+      editReset();
+      setShowSuccessMessage('Category updated successfully!');
+      setTimeout(() => setShowSuccessMessage(null), 3000);
     },
-    onError: (error) => {
-      setShowErrorMessage('Error updating category: ' + error)
-      setTimeout(() => setShowErrorMessage(null), 5000)
+    onError: error => {
+      setShowErrorMessage('Error updating category: ' + error);
+      setTimeout(() => setShowErrorMessage(null), 5000);
     },
-  })
+  });
 
   const deleteCategoryMutation = useMutation({
     mutationFn: (id: string) => invoke('delete_category', { id }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['categories'] })
-      setShowSuccessMessage('Category deleted successfully!')
-      setTimeout(() => setShowSuccessMessage(null), 3000)
+      queryClient.invalidateQueries({ queryKey: ['categories'] });
+      setShowSuccessMessage('Category deleted successfully!');
+      setTimeout(() => setShowSuccessMessage(null), 3000);
     },
-    onError: (error) => {
-      setShowErrorMessage('Error deleting category: ' + error)
-      setTimeout(() => setShowErrorMessage(null), 5000)
+    onError: error => {
+      setShowErrorMessage('Error al eliminar categoría: ' + error);
+      setTimeout(() => setShowErrorMessage(null), 5000);
     },
-  })
+  });
 
   const onSubmit = (data: CategoryFormData) => {
-    createCategoryMutation.mutate(data)
-  }
+    createCategoryMutation.mutate(data);
+  };
 
   const onEditSubmit = (data: CategoryFormData) => {
     if (editingCategory) {
-      updateCategoryMutation.mutate({ id: editingCategory.id, data })
+      updateCategoryMutation.mutate({ id: editingCategory.id, data });
     }
-  }
+  };
 
   const handleEdit = (category: Category) => {
-    setEditingCategory(category)
+    setEditingCategory(category);
     editReset({
       name: category.name,
       description: category.description || '',
       color: category.color,
       tax_rate_id: category.tax_rate_id || defaultTaxRate,
-    })
-    setShowEditModal(true)
-  }
+    });
+    setShowEditModal(true);
+  };
 
   const handleDelete = (id: string, name: string) => {
-    if (confirm(`Are you sure you want to delete the category "${name}" ?`)) {
-      deleteCategoryMutation.mutate(id)
+    if (
+      confirm(`¿Estás seguro de que deseas eliminar la categoría "${name}"?`)
+    ) {
+      deleteCategoryMutation.mutate(id);
     }
-  }
+  };
 
   const handleAddNew = () => {
-    reset()
-    setShowAddModal(true)
-  }
+    reset();
+    setShowAddModal(true);
+  };
 
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
       </div>
-    )
+    );
   }
 
   if (error) {
@@ -190,11 +208,11 @@ export default function Categories() {
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
           <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
-          <p className="text-red-600">Error loading categories</p>
+          <p className="text-red-600">Error al cargar categorías</p>
           <p className="text-sm text-gray-500 mt-2">{String(error)}</p>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -203,15 +221,17 @@ export default function Categories() {
       <div className="mb-8">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Categories</h1>
-            <p className="text-gray-600">Manage your product categories</p>
+            <h1 className="text-2xl font-bold text-gray-900">Categorías</h1>
+            <p className="text-gray-600">
+              Gestiona las categorías de tus productos
+            </p>
           </div>
           <button
             onClick={handleAddNew}
             className="btn btn-primary flex items-center"
           >
             <Plus className="w-4 h-4 mr-2" />
-            New Category
+            Nueva Categoría
           </button>
         </div>
       </div>
@@ -233,7 +253,7 @@ export default function Categories() {
 
       {/* Categories Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {categories?.map((category) => (
+        {categories?.map(category => (
           <div key={category.id} className="card p-6">
             <div className="flex items-start justify-between mb-4">
               <div className="flex items-center">
@@ -241,7 +261,9 @@ export default function Categories() {
                   className="w-4 h-4 rounded-full mr-3"
                   style={{ backgroundColor: category.color }}
                 ></div>
-                <h3 className="text-lg font-semibold text-gray-900">{category.name}</h3>
+                <h3 className="text-lg font-semibold text-gray-900">
+                  {category.name}
+                </h3>
               </div>
               <div className="flex space-x-2">
                 <button
@@ -265,18 +287,31 @@ export default function Categories() {
 
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center space-x-4 text-sm text-gray-500">
-                <span>Tax: <span className="font-semibold text-gray-700">
-                  {(() => {
-                    const taxRate = currentConfig.tax_rates.find(r => r.id === category.tax_rate_id)
-                    return taxRate ? `${taxRate.name} (${taxRate.rate}%)` : 'Not defined'
-                  })()}
-                </span></span>
-                <span>Created on {new Date(category.created_at).toLocaleDateString('en-US')}</span>
+                <span>
+                  Tax:{' '}
+                  <span className="font-semibold text-gray-700">
+                    {(() => {
+                      const taxRate = currentConfig.tax_rates.find(
+                        r => r.id === category.tax_rate_id
+                      );
+                      return taxRate
+                        ? `${taxRate.name} (${taxRate.rate}%)`
+                        : 'Not defined';
+                    })()}
+                  </span>
+                </span>
+                <span>
+                  Created on{' '}
+                  {new Date(category.created_at).toLocaleDateString('en-US')}
+                </span>
               </div>
-              <span className={`px-2 py-1 rounded-full text-xs ${category.is_active
-                ? 'bg-success-100 text-success-800'
-                : 'bg-gray-100 text-gray-800'
-                }`}>
+              <span
+                className={`px-2 py-1 rounded-full text-xs ${
+                  category.is_active
+                    ? 'bg-success-100 text-success-800'
+                    : 'bg-gray-100 text-gray-800'
+                }`}
+              >
                 {category.is_active ? 'Active' : 'Inactive'}
               </span>
             </div>
@@ -287,8 +322,12 @@ export default function Categories() {
       {categories?.length === 0 && (
         <div className="text-center py-12">
           <Tags className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-gray-900 mb-2">No categories</h3>
-          <p className="text-gray-500 mb-4">Start by creating your first category</p>
+          <h3 className="text-lg font-medium text-gray-900 mb-2">
+            No categories
+          </h3>
+          <p className="text-gray-500 mb-4">
+            Start by creating your first category
+          </p>
           <button onClick={handleAddNew} className="btn btn-primary">
             Create a category
           </button>
@@ -310,12 +349,16 @@ export default function Categories() {
                   placeholder="Category name"
                 />
                 {errors.name && (
-                  <p className="text-danger-600 text-sm mt-1">{errors.name.message}</p>
+                  <p className="text-danger-600 text-sm mt-1">
+                    {errors.name.message}
+                  </p>
                 )}
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-2">Description</label>
+                <label className="block text-sm font-medium mb-2">
+                  Description
+                </label>
                 <textarea
                   {...register('description')}
                   className="input"
@@ -325,16 +368,18 @@ export default function Categories() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-2">Color *</label>
+                <label className="block text-sm font-medium mb-2">
+                  Color *
+                </label>
                 <div className="flex items-center space-x-3">
                   <input
                     type="color"
                     className="w-12 h-10 border border-gray-300 rounded-lg cursor-pointer"
                     defaultValue="#3B82F6"
-                    onChange={(e) => {
-                      setValue('color', e.target.value)
+                    onChange={e => {
+                      setValue('color', e.target.value);
                       if (addColorInputRef.current) {
-                        addColorInputRef.current.value = e.target.value
+                        addColorInputRef.current.value = e.target.value;
                       }
                     }}
                   />
@@ -344,32 +389,35 @@ export default function Categories() {
                     className="input flex-1"
                     placeholder="#3B82F6"
                     defaultValue="#3B82F6"
-                    onChange={(e) => {
+                    onChange={e => {
                       if (addColorPickerRef.current) {
-                        addColorPickerRef.current.value = e.target.value
+                        addColorPickerRef.current.value = e.target.value;
                       }
                     }}
                   />
                 </div>
                 {errors.color && (
-                  <p className="text-danger-600 text-sm mt-1">{errors.color.message}</p>
+                  <p className="text-danger-600 text-sm mt-1">
+                    {errors.color.message}
+                  </p>
                 )}
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-2">Tax Rate</label>
-                <select
-                  {...register('tax_rate_id')}
-                  className="input"
-                >
-                  {taxRateOptions.map((option) => (
+                <label className="block text-sm font-medium mb-2">
+                  Tax Rate
+                </label>
+                <select {...register('tax_rate_id')} className="input">
+                  {taxRateOptions.map(option => (
                     <option key={option.value} value={option.value}>
                       {option.label} {option.isDefault && '(Default)'}
                     </option>
                   ))}
                 </select>
                 {errors.tax_rate_id && (
-                  <p className="text-danger-600 text-sm mt-1">{errors.tax_rate_id.message}</p>
+                  <p className="text-danger-600 text-sm mt-1">
+                    {errors.tax_rate_id.message}
+                  </p>
                 )}
               </div>
 
@@ -400,7 +448,10 @@ export default function Categories() {
           <div className="bg-white rounded-lg p-6 w-full max-w-md">
             <h3 className="text-lg font-semibold mb-4">Edit Category</h3>
 
-            <form onSubmit={editHandleSubmit(onEditSubmit)} className="space-y-4">
+            <form
+              onSubmit={editHandleSubmit(onEditSubmit)}
+              className="space-y-4"
+            >
               <div>
                 <label className="block text-sm font-medium mb-2">Name *</label>
                 <input
@@ -409,12 +460,16 @@ export default function Categories() {
                   placeholder="Category name"
                 />
                 {editErrors.name && (
-                  <p className="text-danger-600 text-sm mt-1">{editErrors.name.message}</p>
+                  <p className="text-danger-600 text-sm mt-1">
+                    {editErrors.name.message}
+                  </p>
                 )}
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-2">Description</label>
+                <label className="block text-sm font-medium mb-2">
+                  Description
+                </label>
                 <textarea
                   {...editRegister('description')}
                   className="input"
@@ -424,51 +479,58 @@ export default function Categories() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-2">Color *</label>
+                <label className="block text-sm font-medium mb-2">
+                  Color *
+                </label>
                 <div className="flex items-center space-x-3">
                   <input
                     type="color"
                     className="w-12 h-10 border border-gray-300 rounded-lg cursor-pointer"
-                    defaultValue={editingCategory?.color || "#3B82F6"}
-                    onChange={(e) => {
-                      editSetValue('color', e.target.value)
+                    defaultValue={editingCategory?.color || '#3B82F6'}
+                    onChange={e => {
+                      editSetValue('color', e.target.value);
                       if (editColorInputRef.current) {
-                        editColorInputRef.current.value = e.target.value
+                        editColorInputRef.current.value = e.target.value;
                       }
                     }}
                   />
                   <input
-                    {...editRegister('color', { required: 'Color is required' })}
+                    {...editRegister('color', {
+                      required: 'Color is required',
+                    })}
                     ref={editColorInputRef}
                     className="input flex-1"
                     placeholder="#3B82F6"
-                    defaultValue={editingCategory?.color || "#3B82F6"}
-                    onChange={(e) => {
+                    defaultValue={editingCategory?.color || '#3B82F6'}
+                    onChange={e => {
                       if (editColorPickerRef.current) {
-                        editColorPickerRef.current.value = e.target.value
+                        editColorPickerRef.current.value = e.target.value;
                       }
                     }}
                   />
                 </div>
                 {editErrors.color && (
-                  <p className="text-danger-600 text-sm mt-1">{editErrors.color.message}</p>
+                  <p className="text-danger-600 text-sm mt-1">
+                    {editErrors.color.message}
+                  </p>
                 )}
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-2">Tax Rate</label>
-                <select
-                  {...editRegister('tax_rate_id')}
-                  className="input"
-                >
-                  {taxRateOptions.map((option) => (
+                <label className="block text-sm font-medium mb-2">
+                  Tax Rate
+                </label>
+                <select {...editRegister('tax_rate_id')} className="input">
+                  {taxRateOptions.map(option => (
                     <option key={option.value} value={option.value}>
                       {option.label} {option.isDefault && '(Default)'}
                     </option>
                   ))}
                 </select>
                 {editErrors.tax_rate_id && (
-                  <p className="text-danger-600 text-sm mt-1">{editErrors.tax_rate_id.message}</p>
+                  <p className="text-danger-600 text-sm mt-1">
+                    {editErrors.tax_rate_id.message}
+                  </p>
                 )}
               </div>
 
@@ -476,8 +538,8 @@ export default function Categories() {
                 <button
                   type="button"
                   onClick={() => {
-                    setShowEditModal(false)
-                    setEditingCategory(null)
+                    setShowEditModal(false);
+                    setEditingCategory(null);
                   }}
                   className="flex-1 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
                 >
@@ -496,6 +558,5 @@ export default function Categories() {
         </div>
       )}
     </div>
-  )
+  );
 }
-

@@ -154,25 +154,25 @@ pub async fn detect_anomalies(request: AnomalyDetectionRequest) -> Result<Vec<An
     
     let mut anomalies = Vec::new();
     
-    // Vérifier l'intégrité de la chaîne si activée
+    // Verificar la integridad de la cadena si está activada
     if request.enable_chain_validation {
         let chain_anomalies = detect_chain_anomalies(&conn).map_err(|e| e.to_string())?;
         anomalies.extend(chain_anomalies);
     }
     
-    // Vérifier la cohérence temporelle si activée
+    // Verificar la coherencia temporal si está activada
     if request.enable_time_validation {
         let time_anomalies = detect_time_anomalies(&conn, &request.session_id, request.max_time_drift)
             .map_err(|e| e.to_string())?;
         anomalies.extend(time_anomalies);
     }
     
-    // Détecter les montants suspects
+    // Detectar montos sospechosos
     let amount_anomalies = detect_amount_anomalies(&conn, request.suspicious_amount_threshold)
         .map_err(|e| e.to_string())?;
     anomalies.extend(amount_anomalies);
     
-    // Sauvegarder les anomalies détectées
+    // Guardar las anomalías detectadas
     for anomaly in &anomalies {
         insert_anomaly(&conn, anomaly).map_err(|e| e.to_string())?;
     }
@@ -228,17 +228,17 @@ pub async fn generate_compliance_report(request: ComplianceReportRequest) -> Res
         .filter(|log| log.created_at >= period_start && log.created_at <= period_end)
         .collect();
     
-    // Calculer les statistiques
+    // Calcular las estadísticas
     let total_transactions = period_logs.len() as i64;
     let total_amount: f64 = period_logs
         .iter()
         .filter_map(|log| log.amount)
         .sum();
     
-    // Vérifier l'intégrité de la chaîne
+    // Verificar la integridad de la cadena
     let chain_integrity = verify_chain_integrity(&period_logs);
     
-    // Vérifier la cohérence temporelle
+    // Verificar la coherencia temporal
     let time_consistency = verify_time_consistency(&period_logs);
     
     // Compter les anomalies
@@ -305,7 +305,7 @@ pub async fn save_security_config_command(config: SecurityConfig) -> Result<(), 
     Ok(())
 }
 
-// Fonctions utilitaires pour la détection d'anomalies
+// Funciones utilitarias para la detección de anomalías
 fn detect_chain_anomalies(conn: &Connection) -> Result<Vec<Anomaly>, rusqlite::Error> {
     let logs = get_secure_logs(conn, None)?;
     let mut anomalies = Vec::new();

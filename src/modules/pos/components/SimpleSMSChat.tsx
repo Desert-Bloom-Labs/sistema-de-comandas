@@ -232,7 +232,7 @@ export default function SimpleSMSChat({
             await loadTimelineEvents()
         } catch (error) {
             console.error('Error sending SMS:', error)
-            // En cas d'erreur, ajouter quand même le message avec statut failed
+            // En caso de error, agregar el mensaje con estado failed
             const failedMessage: SMSMessage = {
                 id: Date.now().toString(),
                 message,

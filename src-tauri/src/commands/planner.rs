@@ -114,7 +114,7 @@ pub fn create_planner_item(request: CreatePlannerItemRequest) -> Result<PlannerI
         request.size,
         request.rotation,
         request.color,
-        request.metadata, // Ajout des métadonnées
+        request.metadata, // Agregar metadatos
     );
     
     insert_planner_item(&conn, &item).map_err(|e| e.to_string())?;
@@ -308,7 +308,7 @@ pub fn sync_planner_layout_with_tables(layout_id: String) -> Result<(), String> 
                 size,
                 0.0, // No rotation
                 "#8B4513".to_string(), // Brown color
-                Some(metadata), // Ajout des métadonnées
+                Some(metadata), // Agregar metadatos
             );
             
             // Insert the item into the database

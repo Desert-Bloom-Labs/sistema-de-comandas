@@ -350,7 +350,7 @@ export const smsTicketService = {
         try {
             console.log('Testing SMS Gateway Android connection:', config)
 
-            // Vérifier que nous avons les paramètres nécessaires
+            // Verificar que tenemos los parámetros necesarios
             if (!config.device_ip || !config.port || !config.username || !config.password) {
                 throw new Error('Configuration SMS Gateway Android incomplète')
             }
@@ -414,7 +414,7 @@ export const smsTicketService = {
         try {
             console.log('Testing Infobip connection:', config)
 
-            // Vérifier que nous avons les paramètres nécessaires
+            // Verificar que tenemos los parámetros necesarios
             if (!config.api_key || !config.base_url || !config.sender_name) {
                 throw new Error('Configuration Infobip incomplète')
             }

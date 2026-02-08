@@ -11,10 +11,10 @@ pub async fn create_order_from_cart(
     let db_path = database::get_db_path().map_err(|e| e.to_string())?;
     let conn = database::get_connection(&db_path).map_err(|e| e.to_string())?;
 
-    // Générer un numéro de commande
+    // Generar un número de pedido
     let order_number = database::generate_order_number(&conn).map_err(|e| e.to_string())?;
 
-    // Convertir les items du panier en items de commande
+    // Convertir los artículos del carrito en artículos de pedido
     let order_items: Vec<OrderItem> = cart_items
         .into_iter()
         .map(|cart_item| OrderItem {
@@ -27,10 +27,10 @@ pub async fn create_order_from_cart(
         })
         .collect();
 
-    // Créer la commande
+    // Crear el pedido
     let order = Order::new(order_number, table_id, table_name, order_items);
 
-    // Insérer en base
+    // Insertar en base de datos
     database::insert_order(&conn, &order).map_err(|e| e.to_string())?;
 
     Ok(order)
@@ -92,7 +92,7 @@ pub async fn cancel_order_item(order_id: String, product_id: String) -> Result<(
     let db_path = database::get_db_path().map_err(|e| e.to_string())?;
     let conn = database::get_connection(&db_path).map_err(|e| e.to_string())?;
     
-    // Récupérer la commande
+    // Obtener el pedido
     let mut stmt = conn.prepare(
         "SELECT items FROM orders WHERE id = ?"
     ).map_err(|e| e.to_string())?;
@@ -103,7 +103,7 @@ pub async fn cancel_order_item(order_id: String, product_id: String) -> Result<(
     let mut items: Vec<OrderItem> = serde_json::from_str(&items_json)
         .map_err(|e| format!("Failed to parse items: {}", e))?;
     
-    // Marquer l'item comme annulé
+    // Marcar el artículo como cancelado
     for item in &mut items {
         if item.product_id == product_id {
             item.status = "cancelled".to_string();
@@ -113,7 +113,7 @@ pub async fn cancel_order_item(order_id: String, product_id: String) -> Result<(
     database::update_order_items(&conn, &order_id, &items).map_err(|e| e.to_string())
 }
 
-// ===== COMMANDES CORBEILLE =====
+// ===== COMANDOS DE PAPELERA =====
 
 #[command]
 pub async fn get_trash_orders() -> Result<Vec<Order>, String> {

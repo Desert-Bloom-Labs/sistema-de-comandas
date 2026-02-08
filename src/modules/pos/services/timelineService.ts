@@ -7,11 +7,11 @@ export const timelineService = {
     async getTimelineEvents(limit: number = 50): Promise<TimelineEvent[]> {
         try {
             const [smsMessages, todayReservations] = await Promise.all([
-                smsTicketService.getSMSMessages(limit * 2), // Récupérer plus de SMS
+                smsTicketService.getSMSMessages(limit * 2), // Obtener más SMS
                 reservationService.getReservationsWithTableInfo(new Date().toISOString().split('T')[0])
             ])
 
-            // Créer les événements de réservation (exclure les annulées)
+            // Crear los eventos de reserva (excluir las canceladas)
             const reservationEvents = todayReservations
                 .filter(reservation => reservation.status !== 'cancelled')
                 .map(reservation => ({
@@ -22,7 +22,7 @@ export const timelineService = {
                     priority: this.calculateReservationPriority(reservation)
                 }))
 
-            // Créer les événements SMS
+            // Crear los eventos SMS
             const smsEvents = smsMessages.map(sms => ({
                 id: `sms-${sms.id}`,
                 type: 'sms' as const,
@@ -31,7 +31,7 @@ export const timelineService = {
                 priority: 'low' as const
             }))
 
-            // Trier intelligemment : messages récents en bas, événements futurs dans l'ordre chronologique
+            // Ordenar inteligentemente: mensajes recientes abajo, eventos futuros en orden cronológico
             const now = new Date()
             const allEvents = [...smsEvents, ...reservationEvents]
 
@@ -40,17 +40,17 @@ export const timelineService = {
                 const timeB = new Date(b.timestamp).getTime()
                 const nowTime = now.getTime()
 
-                // Si les deux événements sont dans le passé, trier par ordre décroissant (plus récent en bas)
+                // Si ambos eventos están en el pasado, ordenar en orden decreciente (más reciente abajo)
                 if (timeA <= nowTime && timeB <= nowTime) {
-                    return timeA - timeB // Plus ancien en haut, plus récent en bas
+                    return timeA - timeB // Más antiguo arriba, más reciente abajo
                 }
 
-                // Si les deux événements sont dans le futur, trier par ordre croissant (plus proche en haut)
+                // Si ambos eventos están en el futuro, ordenar en orden creciente (más cercano arriba)
                 if (timeA > nowTime && timeB > nowTime) {
-                    return timeA - timeB // Plus proche en haut
+                    return timeA - timeB // Más cercano arriba
                 }
 
-                // Si un est dans le passé et l'autre dans le futur, le passé va en haut
+                // Si uno está en el pasado y el otro en el futuro, el pasado va arriba
                 if (timeA <= nowTime && timeB > nowTime) {
                     return -1 // A (passé) avant B (futur)
                 }
@@ -71,10 +71,10 @@ export const timelineService = {
         const reservationTime = new Date(`${reservation.reservation_date}T${reservation.reservation_time}`)
         const minutesUntil = Math.floor((reservationTime.getTime() - now.getTime()) / (1000 * 60))
 
-        if (minutesUntil < 0) return 'low' // Passé
-        if (minutesUntil < 15) return 'urgent' // Arrive dans 15min
-        if (minutesUntil < 60) return 'high' // Arrive dans 1h
-        return 'medium' // Plus tard
+        if (minutesUntil < 0) return 'low' // Pasado
+        if (minutesUntil < 15) return 'urgent' // Llega en 15min
+        if (minutesUntil < 60) return 'high' // Llega en 1h
+        return 'medium' // Más tarde
     },
 
     async getFilteredTimelineEvents(filters: TimelineFilters): Promise<TimelineEvent[]> {
@@ -107,12 +107,12 @@ export const timelineService = {
             })
         }
 
-        // Filtre par type d'événement
+        // Filtro por tipo de evento
         if (filters.eventType && filters.eventType !== 'all') {
             filteredEvents = filteredEvents.filter(event => event.type === filters.eventType)
         }
 
-        // Filtre par priorité
+        // Filtro por prioridad
         if (filters.priority && filters.priority !== 'all') {
             filteredEvents = filteredEvents.filter(event => event.priority === filters.priority)
         }
@@ -244,13 +244,13 @@ export const timelineService = {
         })
     },
 
-    // Fonctions utilitaires pour l'affichage
+    // Funciones utilitarias para la visualización
     shouldShowReservation(reservation: Reservation): boolean {
         const now = new Date()
         const reservationTime = new Date(`${reservation.reservation_date}T${reservation.reservation_time}`)
         const hoursUntil = (reservationTime.getTime() - now.getTime()) / (1000 * 60 * 60)
 
-        // Afficher les réservations des 4 prochaines heures
+        // Mostrar las reservas de las próximas 4 horas
         return hoursUntil >= -1 && hoursUntil <= 4
     },
 
