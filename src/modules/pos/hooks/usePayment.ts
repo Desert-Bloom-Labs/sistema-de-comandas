@@ -1,66 +1,72 @@
-import { useMutation } from '@tanstack/react-query'
-import { useState } from 'react'
-import { useTaxSettings } from '../../../shared/hooks/useTaxSettings'
-import { logsService } from '../../../shared/services/logsService'
-import { Product } from '../../../shared/types/app'
-import { CartItem } from '../types'
-import { ordersService } from '../../orders/services/ordersService'
-import { TableData } from '../types'
+import { useMutation } from '@tanstack/react-query';
+import { useState } from 'react';
+import { useTaxSettings } from '../../../shared/hooks/useTaxSettings';
+import { logsService } from '../../../shared/services/logsService';
+import { Product } from '../../../shared/types/app';
+import { CartItem } from '../types';
+import { ordersService } from '../../orders/services/ordersService';
+import { TableData } from '../types';
 
-export const usePayment = (selectedTable: TableData | null, cartItems: CartItem[], products: Product[]) => {
-  const [isProcessingPayment, setIsProcessingPayment] = useState(false)
-  const [isSendingToKitchen, setIsSendingToKitchen] = useState(false)
-  const { formatAmount } = useTaxSettings()
+export const usePayment = (
+  selectedTable: TableData | null,
+  cartItems: CartItem[],
+  products: Product[]
+) => {
+  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
+  const [isSendingToKitchen, setIsSendingToKitchen] = useState(false);
+  const { formatAmount } = useTaxSettings();
 
   const sendToKitchenMutation = useMutation({
     mutationFn: async () => {
       if (!selectedTable || cartItems.length === 0) {
-        throw new Error('Aucune table sélectionnée ou panier vide')
+        throw new Error('Aucune table sélectionnée ou panier vide');
       }
 
       // Verificar si ya existe un pedido para esta mesa
-      const existingOrder = await ordersService.getOrderByTable(selectedTable.id)
+      const existingOrder = await ordersService.getOrderByTable(
+        selectedTable.id
+      );
 
       // Convert cart items to order items format
       const orderItems = cartItems.map(item => {
-        const product = products.find(p => p.id === item.product_id)
+        const product = products.find(p => p.id === item.product_id);
         return {
           product_id: item.product_id,
           product_name: product?.name || item.product_name,
           quantity: item.quantity,
           unit_price: item.unit_price,
           total_price: item.total_price,
-          status: 'active' as const
-        }
-      })
+          status: 'active' as const,
+        };
+      });
 
       if (existingOrder) {
         // Actualizar el pedido existente
-        await ordersService.updateOrderItems(existingOrder.id, orderItems)
-        return 'Commande mise à jour en cuisine avec succès'
+        await ordersService.updateOrderItems(existingOrder.id, orderItems);
+        return 'Commande mise à jour en cuisine avec succès';
       } else {
         // Crear un nuevo pedido
         await ordersService.createOrderFromCart(
           selectedTable.id,
           selectedTable.name,
           orderItems
-        )
-        return 'Nouvelle commande envoyée en cuisine avec succès'
+        );
+        return 'Nouvelle commande envoyée en cuisine avec succès';
       }
-    }
-  })
+    },
+  });
 
   const sendToKitchen = async () => {
-    setIsSendingToKitchen(true)
+    setIsSendingToKitchen(true);
     try {
-      await sendToKitchenMutation.mutateAsync()
+      await sendToKitchenMutation.mutateAsync();
     } catch (error) {
-      console.error('Erreur lors de l\'envoi en cuisine:', error)
-      throw error
+      console.error("Erreur lors de l'envoi en cuisine:", error);
+      throw error;
     } finally {
-      setIsSendingToKitchen(false)
+      setIsSendingToKitchen(false);
     }
-  }
+  };
 
   const processPayment = async (
     totalAmount: number,
@@ -70,11 +76,11 @@ export const usePayment = (selectedTable: TableData | null, cartItems: CartItem[
     customerName: string,
     onSuccess: () => void
   ) => {
-    setIsProcessingPayment(true)
+    setIsProcessingPayment(true);
 
     try {
       // Simuler un traitement de paiement
-      await new Promise(resolve => setTimeout(resolve, 1500))
+      await new Promise(resolve => setTimeout(resolve, 1500));
 
       // Enregistrer l'événement de vente dans les logs
       await logsService.logSaleEvent(
@@ -87,9 +93,9 @@ export const usePayment = (selectedTable: TableData | null, cartItems: CartItem[
         cartItems.map((item: any) => ({
           product_name: item.product_name,
           quantity: item.quantity,
-          unit_price: item.unit_price
+          unit_price: item.unit_price,
         }))
-      )
+      );
 
       // Enregistrer spécifiquement les détails de TVA
       try {
@@ -105,28 +111,31 @@ export const usePayment = (selectedTable: TableData | null, cartItems: CartItem[
             payment_method: paymentMethodName,
             customer_name: customerName,
             table_id: selectedTable?.id,
-            table_name: selectedTable?.name
+            table_name: selectedTable?.name,
           }
-        )
+        );
       } catch (taxError) {
-        console.error('❌ Erreur lors de l\'enregistrement des détails de TVA:', taxError)
+        console.error(
+          "❌ Erreur lors de l'enregistrement des détails de TVA:",
+          taxError
+        );
         // On continue même si l'enregistrement de TVA échoue
       }
 
-      onSuccess()
+      onSuccess();
     } catch (error) {
-      console.error('❌ Erreur lors du paiement:', error)
-      throw error
+      console.error('❌ Erreur lors du paiement:', error);
+      throw error;
     } finally {
-      setIsProcessingPayment(false)
+      setIsProcessingPayment(false);
     }
-  }
+  };
 
   return {
     sendToKitchen,
     processPayment,
     isProcessingPayment,
     isSendingToKitchen,
-    sendToKitchenMutation
-  }
-}
+    sendToKitchenMutation,
+  };
+};
